@@ -11,7 +11,7 @@ export default function InstructionAlert() {
                     <div className="ml-5 mt-[-30px] text-gray-900 w-full md:w-[50%] lg:w-[40%] text-center md:text-left">
                         If you wish to apply for the offers below, you must submit a pre-qualification by clicking
                         on{" "}
-                        <span className="font-semibold">« Register »</span> if you don't have an account yet. Follow the
+                        <span className="font-semibold">« Register »</span> if you don&apos;t have an account yet. Follow the
                         instructions on the page that will open.
                     </div>
                 </div>

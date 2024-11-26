@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import footerLogo from "@/assets/image/footerLogo.png";
 import bgImage2 from "@/assets/image/bg-image2.png";
 import bgImage1 from "@/assets/image/bg-image1.png";
 import {Download} from "lucide-react";
 import {useState} from "react";
-import { FileText } from 'lucide-react';
-import { Paperclip } from 'lucide-react';
 
 export default function RegisterTender() {
     const [sector, setSector] = useState(""); // Use state to manage the sector selection

@@ -46,6 +46,7 @@ export function AdminNavbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isClient, setIsClient] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false) // State for modal
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isLoggedIn, setIsLoggedIn] = useState(true) // Dummy state for logged-in user, replace with actual logic
 
     // This hook ensures that useRouter is used only on the client side

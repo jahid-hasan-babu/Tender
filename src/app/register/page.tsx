@@ -9,13 +9,15 @@ import bgImage2 from "@/assets/image/bg-image2.png";
 import bgImage1 from "@/assets/image/bg-image1.png";
 import { Download, FileText, Paperclip, X } from "lucide-react";
 import { useState } from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useDispatch, useSelector } from "react-redux";
-import { submitForm } from "../redux/slice/registrationSlice"; 
-import { RootState } from "../store"; 
-
+import { RootState } from "../redux/store";
+import { submitForm } from "../redux/slice/registrationSlice";
+import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
+// import { submitForm } from "../redux/slice/registrationSlice";
 
 export default function Register() {
-    const dispatch = useDispatch();
+    const dispatch: ThunkDispatch<RootState, unknown, AnyAction>  = useDispatch();
     const { loading, success, error } = useSelector((state: RootState) => state.registration);
     const [sector, setSector] = useState("");
     const [browseButtons, setBrowseButtons] = useState<string[]>([]);  // State to track Browse buttons
@@ -87,7 +89,8 @@ export default function Register() {
         });
 
 
-        dispatch(submitForm(data));
+        // dispatch(submitForm(data));
+        dispatch(submitForm(data))
     };
 
 

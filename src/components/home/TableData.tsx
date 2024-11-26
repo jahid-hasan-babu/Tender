@@ -7,7 +7,7 @@ import { Search, ChevronDown, ChevronLeft, ChevronRight, FileText } from 'lucide
 
 export default function TableData() {
     const dispatch = useDispatch<AppDispatch>();
-    const { tenders, loading, error } = useSelector((state: RootState) => state.tenders);
+    const { tenders } = useSelector((state: RootState) => state.tenders);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);

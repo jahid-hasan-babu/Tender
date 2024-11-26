@@ -34,7 +34,7 @@ const initialState: TendersState = {
 // Async thunk for fetching tenders
 export const fetchTenders = createAsyncThunk(
     'tenders/fetchTenders',
-    async (queryParams: string = '') => {
+    async (queryParams?: string ) => {
         const response = await fetch(
             `https://white-camel-643529.hostingersite.com/api/tenders${queryParams}`
         );
