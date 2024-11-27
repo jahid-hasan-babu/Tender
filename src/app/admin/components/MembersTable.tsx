@@ -1,122 +1,61 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Search, ChevronDown } from 'lucide-react'
-import { Files } from 'lucide-react';
-import { ChevronLeft } from 'lucide-react'
-import { ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Search, ChevronDown, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { fetchTenders } from '@/app/redux/slice/allMembresSlice';
+import { AppDispatch, RootState } from '@/app/redux/store';
 
-const tenders = [
-    {
-        id: 1,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 2,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 3,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 4,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 5,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 6,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 7,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-    {
-        id: 8,
-        companyName: "TRAINING IN ENTREPRENEURSHIP INITIATION",
-        sector: "Human Resources",
-       password: "@#$%fdfd",
-    },
-]
+export default function TableData() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [departmentFilter, setDepartmentFilter] = useState('All');
 
-export default function MembersTable() {
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage] = useState(5)
+    const dispatch = useDispatch<AppDispatch>();
+    const { tenders, loading, error } = useSelector((state: RootState) => state.newApplication);
 
-    const [searchTerm, setSearchTerm] = useState('') // Search term
-    const [departmentFilter, setDepartmentFilter] = useState('All') // Department filter
+    useEffect(() => {
+        dispatch(fetchTenders());
+    }, [dispatch]);
 
-    const filteredTenders = tenders.filter(tender => {
-        const matchesSearchTerm = tender.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tender.sector.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesDepartment = departmentFilter === 'All' || tender.sector === departmentFilter
-        return matchesSearchTerm && matchesDepartment
-    })
+    // Extract unique departments for the filter dropdown
+    const departmentOptions = Array.from(
+        new Set(tenders?.map((tender) => tender?.company?.sector_of_activity || '')) || []
+    );
 
-    const totalPages = Math.ceil(filteredTenders.length / itemsPerPage)
+    // Filter tenders based on search term and department
+    const filteredTenders = tenders?.filter((tender) => {
+        const company = tender?.company;
+        if (!company) return false;
 
-    const indexOfLastItem = currentPage * itemsPerPage
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage
-    const currentItems = filteredTenders.slice(indexOfFirstItem, indexOfLastItem)
+        const matchesSearchTerm =
+            company.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            company.sector_of_activity?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesDepartment =
+            departmentFilter === 'All' || company.sector_of_activity === departmentFilter;
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+        return matchesSearchTerm && matchesDepartment;
+    });
 
-    const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1))
-    const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages))
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredTenders.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredTenders.slice(indexOfFirstItem, indexOfLastItem);
 
-    const paginationRange = () => {
-        const range = []
-        if (totalPages <= 5) {
-            for (let i = 1; i <= totalPages; i++) {
-                range.push(i)
-            }
-        } else {
-            if (currentPage <= 3) {
-                for (let i = 1; i <= 5; i++) {
-                    range.push(i)
-                }
-                range.push('...')
-            } else if (currentPage >= totalPages - 2) {
-                range.push(1)
-                range.push('...')
-                for (let i = totalPages - 4; i <= totalPages; i++) {
-                    range.push(i)
-                }
-            } else {
-                range.push(1)
-                range.push('...')
-                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-                    range.push(i)
-                }
-                range.push('...')
-                range.push(totalPages)
-            }
-        }
-        return range
-    }
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+    const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
+    if (loading) return <p className='text-center'>Loading tenders...</p>;
+    if (error) return <p className='text-center'>Error: {error}</p>;
 
     return (
-        <div className="w-full max-w-[1200px] mx-auto py-20 px-4 lg:px-0">
-            <div className="flex flex-col lg:flex-row lg:justify-between mb-4 space-y-4 lg:space-y-0 lg:space-x-4">
-                {/* Search Bar */}
+        <div className="w-full max-w-[1200px]  mx-auto py-20 px-4 lg:px-0">
+            <div className='border p-3 border-gray-300 rounded-md'>
+                      {/* Search and Filter */}
+            <div className="flex flex-col  lg:flex-row lg:justify-between mb-4 space-y-4 lg:space-y-0 lg:space-x-4">
                 <div className="relative w-full lg:w-auto">
                     <input
                         type="text"
@@ -127,21 +66,18 @@ export default function MembersTable() {
                     />
                     <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                 </div>
-
-                {/* Department Filter */}
                 <div className="relative w-full lg:w-auto">
                     <select
                         value={departmentFilter}
                         onChange={(e) => setDepartmentFilter(e.target.value)}
                         className="appearance-none bg-white border border-gray-400 rounded-md pl-4 pr-10 py-2 w-full"
                     >
-                        <option value="All">Filter by department</option>
-                        <option value="Human Resources">Human Resources</option>
-                        <option value="IT">IT</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Design">Design</option>
-                        <option value="Business Development">Business Development</option>
-                        <option value="Management">Management</option>
+                        <option value="All">All Departments</option>
+                        {departmentOptions?.map((option, idx) => (
+                            <option key={idx} value={option}>
+                                {option}
+                            </option>
+                        ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
                 </div>
@@ -149,74 +85,61 @@ export default function MembersTable() {
 
             {/* Table */}
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white table-auto">
+                <table className="min-w-full bg-white table-auto border border-gray-200 p-2 ">
                     <thead>
-                    <tr className="bg-gray-100 text-black font-bold text-sm leading-normal">
-                        <th className="py-3 text-left">Number</th>
-                        <th className="py-3 px-6 text-left">Company Name</th>
-                        <th className="py-3 px-6 text-left">Sector of Activity</th>
-                        <th className="py-3 px-6 text-left">Password</th>
-                        <th className="py-3 pl-6 text-end">Action</th>
-                    </tr>
+                        <tr className="bg-gray-100 text-black font-bold text-sm leading-normal">
+                            <th className="py-3  px-6 text-left">Number</th>
+                            <th className="py-3 px-6 text-left">Company Name</th>
+                            <th className="py-3 px-6 text-left">Sector of Activity</th>
+                            <th className="py-3 px-6 text-left">Password</th>
+                            <th className="py-3 px-6 text-end">Action</th>
+                        </tr>
                     </thead>
                     <tbody className="text-gray-700 font-bold text-sm">
-                    {currentItems.map((tender) => (
-                        <tr key={tender.id} className="border-b border-gray-200 hover:bg-gray-100">
-                            <td className="py-3 text-left whitespace-nowrap">{tender.id}</td>
-                            <td className="py-3 px-6 text-left">{tender.companyName}</td>
-                            <td className="py-3 px-6 text-left">{tender.sector}</td>
-                            <td className="py-3 px-6 text-left">{tender.password}</td>
-                            <td className="py-3 pl-6  float-end">
-                                <button
-                                    className="bg-yellow-500 flex items-center justify-center text-white-white-50 text-md px-3 py-2 rounded-sm"
-                                >
-                                    Copy
-                                    <Files className="h-[15px] w-[15px] ml-2" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                        {currentItems.map((tender, index) => (
+                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
+                                <td className="py-3 px-6 text-left whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
+                                <td className="py-3 px-6 text-left">{tender?.company?.company_name}</td>
+                                <td className="py-3 px-6 text-left">{tender?.company?.sector_of_activity}</td>
+                                <td className="py-3 px-6 text-left">
+                                    {tender?.password}
+                                </td>
+                                <td className="py-3 px-6 text-right">
+                                    <button className="bg-yellow-500 text-white-white-50 px-3 py-1 rounded">
+                                        View <FileText className="inline ml-2" />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
 
             {/* Pagination */}
             <div className="flex justify-center mt-4 space-x-2">
-                <button
-                    onClick={prevPage}
-                    className="px-2 py-1 bg-gray-200 rounded-md border border-gray-400"
-                    disabled={currentPage === 1}
-                >
+                <button onClick={prevPage} className="px-2 py-1 bg-gray-200 rounded-md" disabled={currentPage === 1}>
                     <ChevronLeft />
                 </button>
-
-                {paginationRange().map((page, index) => {
-                    if (page === '...') {
-                        return (
-                            <span key={index} className="px-3 py-1 text-gray-500">...</span>
-                        )
-                    } else {
-                        const pageNumber = typeof page === 'number' ? page : parseInt(page as string, 10)
-                        return (
-                            <button
-                                key={index}
-                                onClick={() => paginate(pageNumber)}
-                                className={`px-3 py-1 rounded ${currentPage === pageNumber ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
-                            >
-                                {page}
-                            </button>
-                        )
-                    }
-                })}
-
+                {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => paginate(i + 1)}
+                        className={`px-3 py-1 rounded ${
+                            currentPage === i + 1 ? 'bg-yellow-500 text-white' : 'bg-gray-200'
+                        }`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
                 <button
                     onClick={nextPage}
-                    className="px-2 py-1 bg-gray-200 rounded-md border border-gray-400"
+                    className="px-2 py-1 bg-gray-200 rounded-md"
                     disabled={currentPage === totalPages}
                 >
                     <ChevronRight />
                 </button>
             </div>
+      </div>
         </div>
-    )
+    );
 }

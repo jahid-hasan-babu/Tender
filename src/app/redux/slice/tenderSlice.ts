@@ -1,58 +1,58 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-interface RegistrationState {
+interface TenderState {
     loading: boolean;
     success: boolean;
     error: string | null;
 }
 
-const initialState: RegistrationState = {
+const initialState: TenderState = {
     loading: false,
     success: false,
     error: null,
 };
 
-// Async thunk for form submission
-export const submitForm = createAsyncThunk(
-    'registration/submitForm',
-    async (formData: FormData, { rejectWithValue }) => {
+// Async thunk for tender form submission
+export const submitTenderForm = createAsyncThunk(
+    'tender/submitTenderForm',
+    async (formData: FormData, { rejectWithValue, getState }) => {
         try {
+            const token = getState().auth.token; // Get the token from the auth state
             const response = await axios.post(
-                'https://white-camel-643529.hostingersite.com/api/submit-form',
+                'https://your-api-endpoint.com/api/tender-submit',
                 formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                       
+                        'Authorization': `Bearer ${token}`, // Attach token in headers
                     },
                 }
             );
             return response.data;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             return rejectWithValue(error.response?.data || 'Something went wrong');
         }
     }
 );
 
-const registrationSlice = createSlice({
-    name: 'registration',
+const tenderSlice = createSlice({
+    name: 'tender',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(submitForm.pending, (state) => {
+            .addCase(submitTenderForm.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(submitForm.fulfilled, (state) => {
+            .addCase(submitTenderForm.fulfilled, (state) => {
                 state.loading = false;
                 state.success = true;
                 state.error = null;
             })
-            .addCase(submitForm.rejected, (state, action) => {
+            .addCase(submitTenderForm.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
                 state.success = false;
@@ -60,4 +60,4 @@ const registrationSlice = createSlice({
     },
 });
 
-export default registrationSlice.reducer;
+export default tenderSlice.reducer;

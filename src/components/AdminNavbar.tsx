@@ -1,5 +1,4 @@
-'use client'
-
+"use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X } from 'lucide-react'
@@ -8,12 +7,15 @@ import logo from "@/assets/image/logo.png"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import Folder from "@/assets/image/folder.png"
+import { useDispatch, useSelector } from "react-redux"
+import { useRouter } from 'next/navigation' // Import useRouter for redirect
+import { logout } from "@/app/redux/slice/authSlice"
 
 // Modal Component
 function Modal({ isOpen, onClose, onLogout }: { isOpen: boolean, onClose: () => void, onLogout: () => void }) {
     return (
         <div
-            className={`fixed top-center right-center lg:top-[80px] lg:right-[375px]  z-50 border border-orange-500 rounded-md bg-white-white-50 bg-opacity-100 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`fixed top-center right-center lg:top-[80px] lg:right-[375px] z-50 border border-orange-500 rounded-md bg-white-white-50 bg-opacity-100 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={onClose}
         >
             <div
@@ -46,8 +48,9 @@ export function AdminNavbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isClient, setIsClient] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false) // State for modal
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [isLoggedIn, setIsLoggedIn] = useState(true) // Dummy state for logged-in user, replace with actual logic
+    const dispatch = useDispatch()
+    const user = useSelector((state: any) => state.auth.user) // Accessing the user from the Redux store
+    const router = useRouter() // Hook to handle redirection
 
     // This hook ensures that useRouter is used only on the client side
     useEffect(() => {
@@ -59,10 +62,11 @@ export function AdminNavbar() {
         return null
     }
 
-    // Handle logout (this could be more complex depending on your auth logic)
+    // Handle logout using Redux action and redirect to the homepage
     const handleLogout = () => {
-        setIsLoggedIn(false) // Example: handle actual logout logic here
-        alert("Logged out!")
+        dispatch(logout()) // Dispatch the logout action
+        setIsModalOpen(false) // Close the modal after logout
+        router.push('/') // Redirect to the home page
     }
 
     return (
@@ -128,21 +132,21 @@ function NavItems() {
         <>
             <Link
                 href="/admin/tenders"
-                className={`text-lg text-black-black-400  ${isActive('/admin/tenders') ? 'font-bold text-black-black-900' : 'font-light'}`}
+                className={`text-lg text-black-black-400 ${isActive('/admin/tenders') ? 'font-bold text-black-black-900' : 'font-light'}`}
             >
                 Tenders
             </Link>
 
             <Link
                 href="/admin/applications"
-                className={`text-lg text-black-black-400  ${isActive('/admin/applications') ? 'font-bold text-black-black-900' : 'font-light'}`}
+                className={`text-lg text-black-black-400 ${isActive('/admin/applications') ? 'font-bold text-black-black-900' : 'font-light'}`}
             >
                 New Application
             </Link>
 
             <Link
                 href="/admin/members"
-                className={`text-lg text-black-black-400  ${isActive('/admin/members') ? 'font-bold text-black-black-900' : 'font-light'}`}
+                className={`text-lg text-black-black-400 ${isActive('/admin/members') ? 'font-bold text-black-black-900' : 'font-light'}`}
             >
                 All Members
             </Link>

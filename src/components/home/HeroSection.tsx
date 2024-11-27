@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import  delivery from  "@/assets/image/delivery.png"
 import  hamber from "@/assets/image/hamber.png"
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HeroSection() {
     return (
@@ -31,7 +32,8 @@ export default function HeroSection() {
                     </h1>
 
                     <div className="mt-8  flex gap-4 flex-wrap justify-center">
-                        <Button
+                        <Link href="/register">
+                         <Button
                             variant="default"
                             className="bg-black-black-900  text-lg "
                             size="lg"
@@ -39,7 +41,9 @@ export default function HeroSection() {
                             Register
                             <Image src={delivery} alt="delivery image" />
                         </Button>
-                        <Button
+                        </Link>
+                        <Link href="/login">
+                          <Button
                             variant="default"
                             className="bg-yellow-500 text-lg text-black-black-900"
                             size="lg"
@@ -47,6 +51,7 @@ export default function HeroSection() {
                             Login
                            <Image src={hamber} alt="hamber image" />
                         </Button>
+                        </Link>
                     </div>
                 </div>
             </section>

@@ -1,12 +1,13 @@
 import React from 'react';
-import {AdminNavbar} from "@/components/AdminNavbar";
-import TableData from "@/components/home/TableData";
+import TableData from '../components/TableData';
+import { AdminNavbar } from '@/components/AdminNavbar';
+
 
 const Page = () => {
     return (
         <>
-            <AdminNavbar/>
-            <TableData/>
+        <AdminNavbar />
+           <TableData/>
         </>
     );
 };

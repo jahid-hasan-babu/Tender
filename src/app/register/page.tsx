@@ -16,6 +16,9 @@ import { submitForm } from "../redux/slice/registrationSlice";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 // import { submitForm } from "../redux/slice/registrationSlice";
 
+
+;
+
 export default function Register() {
     const dispatch: ThunkDispatch<RootState, unknown, AnyAction>  = useDispatch();
     const { loading, success, error } = useSelector((state: RootState) => state.registration);
@@ -31,6 +34,8 @@ export default function Register() {
         country: '',
         town: '',
         province: '',
+        sector: '',
+        companyDocuments: [],  // Track uploaded file
     });
 
 
@@ -40,16 +45,7 @@ export default function Register() {
     };
 
 
-    const handleDownload = () => {
-        if (!sector) {
-            alert("Please select a sector of activity before downloading.");
-            return;
-        }
 
-
-        console.log("Download initiated for sector:", sector);
-        // Handle the actual download here, e.g., fetching a questionnaire based on the sector
-    };
 
 
     const handleAddFile = () => {
@@ -63,35 +59,34 @@ export default function Register() {
     };
 
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const data = new FormData();
-        data.append("companyName", formData.companyName);
-        data.append("companyId", formData.companyId);
-        data.append("email", formData.email);
-        data.append("phone", formData.phone);
-        data.append("phone2", formData.phone2);
-        data.append("address", formData.address);
-        data.append("country", formData.country);
-        data.append("town", formData.town);
-        data.append("province", formData.province);
-        data.append("sector", sector);
+   const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append("company_name", formData.companyName);
+    data.append("identification_number", formData.companyId);
+    data.append("email", formData.email);
+    data.append("phone", formData.phone);
+    data.append("phone2", formData.phone2);
+    data.append("address", formData.address);
+    data.append("country", formData.country);
+    data.append("town", formData.town);
+    data.append("province", formData.province);
+    data.append("sector_of_activity", sector);
 
+    // Handle file attachments (if any)
+    browseButtons.forEach((_, index) => {
+        const fileInput = document.getElementById(`fileInput-${index}`) as HTMLInputElement;
+        if (fileInput?.files) {
+            Array.from(fileInput.files).forEach(file => {
+                data.append("companyDocuments[]", file);  // Append under the "companyDocuments[]" key
+            });
+        }
+    });
 
-        // Handle file attachments (if any)
-        browseButtons.forEach((_, index) => {
-            const fileInput = document.getElementById(`fileInput-${index}`) as HTMLInputElement;
-            if (fileInput?.files) {
-                Array.from(fileInput.files).forEach(file => {
-                    data.append("files", file);
-                });
-            }
-        });
+    // Dispatch form submission to the backend
+    dispatch(submitForm(data));
+};
 
-
-        // dispatch(submitForm(data));
-        dispatch(submitForm(data))
-    };
 
 
     return (
@@ -272,13 +267,15 @@ export default function Register() {
                                 <h3 className="block w-full text-sm font-medium text-black">
                                     Attached questionnaire
                                 </h3>
-                                <button
+                                <Link href="https://white-camel-643529.hostingersite.com/api/questionnaires/download-all">
+                                 <button
                                     className="w-full bg-black-black-900 text-white-white-50 flex justify-center items-center rounded-md px-6 py-3 text-lg font-medium"
-                                    onClick={handleDownload} // Trigger the download functionality
+                                     
                                 >
                                     Download questionnaire
                                     <Download className="ml-2 h-7 w-7 text-black-black-900 bg-white-white-50 p-1 rounded-full"/>
                                 </button>
+                                </Link>
                         </div>
                       </div>
 

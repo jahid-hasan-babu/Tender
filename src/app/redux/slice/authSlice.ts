@@ -12,7 +12,6 @@ const initialState: AuthState = {
   error: null,
 };
 
-
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }: { email: string; password: string }, thunkAPI) => {
@@ -34,7 +33,15 @@ export const loginUser = createAsyncThunk(
       }
 
       // Parse and return the JSON response
-      return await response.json();
+      const data = await response.json();
+
+      // Assuming the token is in the response's 'token' field
+      const { token, user } = data;
+
+      // Save the token in localStorage
+      localStorage.setItem('authToken', token);
+
+      return user; // Return the user data
     } catch (error) {
       console.error('Login failed:', error);
       return thunkAPI.rejectWithValue((error as Error).message);
@@ -42,15 +49,14 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-
-
-
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     logout: (state) => {
       state.user = null;
+      // Remove token from localStorage on logout
+      localStorage.removeItem('authToken');
     },
   },
   extraReducers: (builder) => {
